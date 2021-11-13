@@ -16,3 +16,12 @@ def get_db_info():
     }
 
     return db_info
+
+def get_google_blueprint_info():
+
+    google_blueprint_info = {
+        "client_id": os.environ.get("GBPCLIENTID", None),
+        "client_secret": os.environ.get("GBPCLIENTSECRET", None),
+    }
+    
+    return google_blueprint_info

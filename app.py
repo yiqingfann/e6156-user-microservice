@@ -1,13 +1,44 @@
-from re import template
-from flask import Flask, Response, request
+from flask import Flask, Response, request, redirect, url_for
+from flask_cors import CORS
+from flask_dance.contrib.google import google, make_google_blueprint
 import json
+import os
 
 from RDBResource import UserResource, AddressResource
+from context import get_google_blueprint_info
+from security import check_authentication
 
 app = Flask(__name__)
 
+# -------------------- authentication --------------------
+
+CORS(app)
+os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+os.environ['OAUTHLIB_RELAX_TOKEN_SCOPE'] = '1'
+app.secret_key = "e6156"
+google_blueprint_info = get_google_blueprint_info()
+google_blueprint = make_google_blueprint(
+    client_id = google_blueprint_info["client_id"],
+    client_secret = google_blueprint_info["client_secret"],
+    scope = ["profile", "email"]
+)
+app.register_blueprint(google_blueprint, url_prefix="/login")
+# google_blueprint = app.blueprints.get("google")
+
+@app.before_request
+def before_request():
+    is_authenticated = check_authentication(request, google)
+    if not is_authenticated:
+        return redirect(url_for('google.login'))
+
+# -------------------- GET / --------------------
+
 @app.route('/')
 def index():
+    google_data = google.get("/oauth2/v2/userinfo").json()
+    user_email = google_data.get("email", None)
+    if user_email:
+        return f"Welcome, {user_email}"
     return "index"
 
 # -------------------- GET, POST /addresses --------------------
