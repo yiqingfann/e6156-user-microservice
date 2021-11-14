@@ -7,6 +7,7 @@ import os
 from RDBResource import UserResource, AddressResource
 from context import get_google_blueprint_info
 from security import check_authentication
+from notification import SNSNotificationHandler
 
 app = Flask(__name__)
 
@@ -31,6 +32,13 @@ def before_request():
     if not is_authenticated:
         return redirect(url_for('google.login'))
 
+# -------------------- notification --------------------
+
+@app.after_request
+def after_request(response):
+    SNSNotificationHandler.notify_if_any(request)
+    return response
+
 # -------------------- GET / --------------------
 
 @app.route('/')
@@ -38,8 +46,10 @@ def index():
     google_data = google.get("/oauth2/v2/userinfo").json()
     user_email = google_data.get("email", None)
     if user_email:
-        return f"Welcome, {user_email}"
-    return "index"
+        response = Response(f"Welcome, {user_email}", status=200)
+    else:
+        response = Response("index", status=200)
+    return response
 
 # -------------------- GET, POST /addresses --------------------
 
