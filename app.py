@@ -120,7 +120,8 @@ def create_user():
     row_data = request.get_json()
     user_id = UserResource.create(row_data)
     response = Response("Successfully created user!", status=200)
-    response.headers['location'] = f"/users/{user_id}"
+    response.headers['Location'] = f"/users/{user_id}"
+    response.headers.add('Access-Control-Expose-Headers', 'Location')
     return response
 
 # -------------------- GET, PUT, DELETE /users/<user_id> --------------------
