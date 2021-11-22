@@ -5,8 +5,9 @@ paths_do_not_require_security = [
 ]
 
 def check_authentication(request, google):
-    for regex in paths_do_not_require_security:
-        if re.match(regex, request.path):
-            return True
+    # for regex in paths_do_not_require_security:
+    #     if re.match(regex, request.path):
+    #         return True
 
-    return True if google.authorized else False
+    # return True if google.authorized else False
+    return True

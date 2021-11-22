@@ -118,8 +118,9 @@ def retrieve_users():
 @app.route('/users', methods = ['POST'])
 def create_user():
     row_data = request.get_json()
-    UserResource.create(row_data)
+    user_id = UserResource.create(row_data)
     response = Response("Successfully created user!", status=200)
+    response.headers['location'] = f"/users/{user_id}"
     return response
 
 # -------------------- GET, PUT, DELETE /users/<user_id> --------------------
