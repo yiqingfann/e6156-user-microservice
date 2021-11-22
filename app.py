@@ -51,31 +51,31 @@ def index():
         response = Response("index", status=200)
     return response
 
-# -------------------- GET, POST /addresses --------------------
+# -------------------- GET, POST /api/addresses --------------------
 
-@app.route('/addresses', methods = ['GET'])
+@app.route('/api/addresses', methods = ['GET'])
 def get_addresses():
     result = AddressResource.find_all()
     response = Response(json.dumps(result), status=200, content_type="application/json")
     return response
 
-@app.route('/addresses', methods = ['POST'])
+@app.route('/api/addresses', methods = ['POST'])
 def create_address():
     row_data = request.get_json()
     AddressResource.create(row_data)
     response = Response("Successfully created address!", status=200)
     return response
 
-# -------------------- GET, PUT, DELETE /addresses/<addr_id> --------------------
+# -------------------- GET, PUT, DELETE /api/addresses/<addr_id> --------------------
 
-@app.route('/addresses/<addr_id>', methods = ['GET'])
+@app.route('/api/addresses/<addr_id>', methods = ['GET'])
 def get_address(addr_id):
     template = {"addr_id": addr_id}
     result = AddressResource.find_by_template(template)
     response = Response(json.dumps(result), status=200, content_type="application/json")
     return response
 
-@app.route('/addresses/<addr_id>', methods = ['PUT'])
+@app.route('/api/addresses/<addr_id>', methods = ['PUT'])
 def update_address(addr_id):
     template = {"addr_id": addr_id}
     new_data = request.get_json()
@@ -83,23 +83,23 @@ def update_address(addr_id):
     response = Response("Successfully updated address!", status=200)
     return response
 
-@app.route('/addresses/<addr_id>', methods = ['DELETE'])
+@app.route('/api/addresses/<addr_id>', methods = ['DELETE'])
 def delete_address(addr_id):
     template = {"addr_id": addr_id}
     AddressResource.delete(template)
     response = Response("Successfully deleted address!", status=200)
     return response
 
-# -------------------- GET, POST /addresses/<addr_id>/users --------------------
+# -------------------- GET, POST /api/addresses/<addr_id>/users --------------------
 
-@app.route('/addresses/<addr_id>/users', methods = ['GET'])
+@app.route('/api/addresses/<addr_id>/users', methods = ['GET'])
 def retrieve_user_under_address(addr_id):
     template = {"addr_id": addr_id}
     result = UserResource.find_by_template(template)
     response = Response(json.dumps(result), status=200, content_type="application/json")
     return response
 
-@app.route('/addresses/<addr_id>/users', methods = ['POST'])
+@app.route('/api/addresses/<addr_id>/users', methods = ['POST'])
 def create_user_under_address(addr_id):
     row_data = request.get_json()
     row_data["addr_id"] = addr_id
@@ -107,33 +107,33 @@ def create_user_under_address(addr_id):
     response = Response("Successfully created user under address!", status=200)
     return response
 
-# -------------------- GET, POST /users --------------------
+# -------------------- GET, POST /api/users --------------------
 
-@app.route('/users', methods = ['GET'])
+@app.route('/api/users', methods = ['GET'])
 def retrieve_users():
     result = UserResource.find_all()
     response = Response(json.dumps(result), status=200, content_type="application/json")
     return response
 
-@app.route('/users', methods = ['POST'])
+@app.route('/api/users', methods = ['POST'])
 def create_user():
     row_data = request.get_json()
     user_id = UserResource.create(row_data)
     response = Response("Successfully created user!", status=200)
-    response.headers['Location'] = f"/users/{user_id}"
+    response.headers['Location'] = f"/api/users/{user_id}"
     response.headers.add('Access-Control-Expose-Headers', 'Location')
     return response
 
-# -------------------- GET, PUT, DELETE /users/<user_id> --------------------
+# -------------------- GET, PUT, DELETE /api/users/<user_id> --------------------
 
-@app.route('/users/<user_id>', methods = ['GET'])
+@app.route('/api/users/<user_id>', methods = ['GET'])
 def retrieve_user(user_id):
     template = {"user_id": user_id}
     result = UserResource.find_by_template(template)
     response = Response(json.dumps(result), status=200, content_type="application/json")
     return response
 
-@app.route('/users/<user_id>', methods = ['PUT'])
+@app.route('/api/users/<user_id>', methods = ['PUT'])
 def update_user(user_id):
     template = {"user_id": user_id}
     new_data = request.get_json()
@@ -141,16 +141,16 @@ def update_user(user_id):
     response = Response("Successfully updated user!", status=200)
     return response
 
-@app.route('/users/<user_id>', methods = ['DELETE'])
+@app.route('/api/users/<user_id>', methods = ['DELETE'])
 def delete_user(user_id):
     template = {"user_id": user_id}
     UserResource.delete(template)
     response = Response("Successfully deleted user!", status=200)
     return response
 
-# -------------------- GET, POST /users/<user_id>/address --------------------
+# -------------------- GET, POST /api/users/<user_id>/address --------------------
 
-@app.route('/users/<user_id>/address', methods = ['GET'])
+@app.route('/api/users/<user_id>/address', methods = ['GET'])
 def get_address_of_user(user_id):
     template = {"user_id": user_id}
     result = UserResource.find_by_template(template)
@@ -161,7 +161,7 @@ def get_address_of_user(user_id):
     response = Response(json.dumps(result), status=200, content_type="application/json")
     return response
 
-@app.route('/users/<user_id>/address', methods = ['POST'])
+@app.route('/api/users/<user_id>/address', methods = ['POST'])
 def create_address_for_user(user_id):
     row_data = request.get_json()
     addr_id = AddressResource.create(row_data)

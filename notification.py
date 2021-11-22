@@ -5,7 +5,7 @@ import json
 from context import get_aws_access_key_info
 
 requests_need_to_be_notified = {
-    'POST /users': "arn:aws:sns:us-east-2:080252012198:sns_user_created"
+    'POST /api/users': "arn:aws:sns:us-east-2:080252012198:sns_user_created"
 }
 
 class SNSNotificationHandler():
