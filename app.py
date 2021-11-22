@@ -171,3 +171,7 @@ def create_address_for_user(user_id):
     UserResource.update(template, new_data)
     response = Response("Successfully created address for user!", status=200)
     return response
+
+# ------------------- main function -------------------
+if __name__ == '__main__':
+    app.run(host="0.0.0.0", port=5000)
