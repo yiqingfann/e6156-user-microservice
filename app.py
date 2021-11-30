@@ -130,7 +130,8 @@ def create_user():
 def retrieve_user(user_id):
     template = {"user_id": user_id}
     fields_str = request.args.get('fields')
-    result = UserResource.find_by_template(template, fields_str)
+    field_list = fields_str.split(",") if fields_str else None
+    result = UserResource.find_by_template(template, field_list)
     response = Response(json.dumps(result), status=200, content_type="application/json")
     return response
 

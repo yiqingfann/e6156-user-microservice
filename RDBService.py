@@ -59,6 +59,7 @@ class RDBService:
     def get_set_clause_from_dict(cls, dict_data):
         '''
             {'a': 1, 'b': 'text'} => "a = 1 and b = 'text'"
+            TODO: {'c': ('d','e')} => "c in ('d', 'e')"
         '''
         assert(len(dict_data) >= 1)
         
@@ -73,10 +74,10 @@ class RDBService:
         return set_clause
 
     @classmethod
-    def find_by_template(cls, db_name, table_name, template, fields_str=None):
+    def find_by_template(cls, db_name, table_name, template, field_list=None):
         equi_clause = cls.get_where_clause_from_template(template)
-        fields_str = fields_str.replace(",", ", ") if fields_str else "*"
-        sql_stmt = f"select {fields_str} from {db_name}.{table_name} where {equi_clause}"
+        field_clause = ", ".join(field_list) if field_list else "*"
+        sql_stmt = f"select {field_clause} from {db_name}.{table_name} where {equi_clause}"
         result = RDBService.run_sql(sql_stmt)
         return result
 
