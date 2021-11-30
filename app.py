@@ -129,7 +129,8 @@ def create_user():
 @app.route('/api/users/<user_id>', methods = ['GET'])
 def retrieve_user(user_id):
     template = {"user_id": user_id}
-    result = UserResource.find_by_template(template)
+    fields_str = request.args.get('fields')
+    result = UserResource.find_by_template(template, fields_str)
     response = Response(json.dumps(result), status=200, content_type="application/json")
     return response
 

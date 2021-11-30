@@ -10,9 +10,9 @@ class BaseRDBResource:
         pass
     
     @classmethod
-    def find_by_template(cls, template):
+    def find_by_template(cls, template, fields_str=None):
         db_name, table_name = cls.get_db_and_table_name()
-        result = RDBService.find_by_template(db_name, table_name, template)
+        result = RDBService.find_by_template(db_name, table_name, template, fields_str)
         return result
     
     @classmethod
