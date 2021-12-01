@@ -42,13 +42,17 @@ class RDBService:
     def get_where_clause_from_template(cls, template):
         '''
             {'a': 1, 'b': 'text'} => "a = 1 and b = 'text'"
+            {'c': ['d','e']} => "c in ('d', 'e')"
         '''
-        assert(len(template) >= 1)
+        if len(template) == 0:
+            return ""
         
-        where_clause = ""
+        where_clause = "where "
         for k, v in template.items():
             if isinstance(v, str):
                 where_clause += f"{k} = '{v}' and "
+            elif isinstance(v, list):
+                where_clause += f"""{k} in ({", ".join([f"'{i}'" for i in v])}) and """
             else:
                 where_clause += f"{k} = {v} and "
         where_clause = where_clause.rstrip(' and ')
@@ -59,7 +63,6 @@ class RDBService:
     def get_set_clause_from_dict(cls, dict_data):
         '''
             {'a': 1, 'b': 'text'} => "a = 1 and b = 'text'"
-            TODO: {'c': ('d','e')} => "c in ('d', 'e')"
         '''
         assert(len(dict_data) >= 1)
         
@@ -77,7 +80,7 @@ class RDBService:
     def find_by_template(cls, db_name, table_name, template, field_list=None):
         equi_clause = cls.get_where_clause_from_template(template)
         field_clause = ", ".join(field_list) if field_list else "*"
-        sql_stmt = f"select {field_clause} from {db_name}.{table_name} where {equi_clause}"
+        sql_stmt = f"select {field_clause} from {db_name}.{table_name} {equi_clause}"
         result = RDBService.run_sql(sql_stmt)
         return result
 
@@ -99,13 +102,13 @@ class RDBService:
         '''
         set_clause = cls.get_set_clause_from_dict(new_data)
         where_clause = cls.get_where_clause_from_template(template)
-        sql_stmt = f"update {db_name}.{table_name} set {set_clause} where {where_clause}"
+        sql_stmt = f"update {db_name}.{table_name} set {set_clause} {where_clause}"
         cls.run_sql(sql_stmt)
 
     @classmethod
     def delete(cls, db_name, table_name, template):
         where_clause = cls.get_where_clause_from_template(template)
-        sql_stmt = f"delete from {db_name}.{table_name} where {where_clause}"
+        sql_stmt = f"delete from {db_name}.{table_name} {where_clause}"
         cls.run_sql(sql_stmt)
 
 # sql_stmt = "insert into user (first_name, last_name, email) values ('mi', 'nana', 'nnm@bilibili.com')"

@@ -1,3 +1,4 @@
+from re import template
 from flask import Flask, Response, request, redirect, url_for
 from flask_cors import CORS
 from flask_dance.contrib.google import google, make_google_blueprint
@@ -111,7 +112,21 @@ def create_user_under_address(addr_id):
 
 @app.route('/api/users', methods = ['GET'])
 def retrieve_users():
-    result = UserResource.find_all()
+    # assume parameter key is either user table column name or field
+    template = {}
+    field_list = []
+    for key in request.args:
+        vals = request.args.get(key).split(",")
+        if key == "fields":
+            field_list.extend(vals)
+        else:
+            if len(vals) == 1:
+                template[key] = vals[0]
+            else:
+                template[key] = vals
+    field_list = field_list if len(field_list) else None
+    
+    result = UserResource.find_by_template(template, field_list)
     response = Response(json.dumps(result), status=200, content_type="application/json")
     return response
 
@@ -123,6 +138,18 @@ def create_user():
     response.headers['Location'] = f"/api/users/{user_id}"
     response.headers.add('Access-Control-Expose-Headers', 'Location')
     return response
+
+# @app.route('/api/users/search', methods = ['POST'])
+# def retrieve_users_with_ids():
+    # post body must be 
+    # {
+    #   "template": {
+    #       "user_id": ["aaa", "bbb", "cccc"],
+    #       "col_2": list of values
+    #       ...
+    #   },
+    #   "field_list": ["user_id", "nickname"]
+    # }
 
 # -------------------- GET, PUT, DELETE /api/users/<user_id> --------------------
 
