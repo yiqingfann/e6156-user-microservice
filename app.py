@@ -44,7 +44,8 @@ def before_request():
     try:
         # print(json.dumps(google_blueprint.session.token, indent=2))
         user_data = google.get('/oauth2/v2/userinfo').json()
-        template = {'email': user_data['email']}
+        email = user_data['email']
+        template = {'email': email}
         result = UserResource.find_by_template(template)
         if not result:
             user_id = str(uuid.uuid4())
@@ -59,6 +60,7 @@ def before_request():
         else:
             user_id = result[0]['user_id']
         g.user_id = user_id
+        g.email = email
     except:
         # for oauthlib.oauth2.rfc6749.errors.TokenExpiredError
         return redirect(url_for('google.login'))
@@ -74,10 +76,7 @@ def after_request(response):
 
 @app.route('/')
 def index():
-    if g.user_id:
-        response = Response(f"Welcome, {g.user_id}", status=200)
-    else:
-        response = Response("You are not logged in", status=200)
+    response = Response(f'Hello\n {g.email}\n {g.user_id}', status=200)
     return response
 
 # -------------------- GET, POST /api/addresses --------------------
