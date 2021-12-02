@@ -3,6 +3,8 @@ import os
 
 load_dotenv()
 
+API_GATEWAY_URL=os.getenv('API_GATEWAY_URL')
+
 def get_db_info():
     '''
         get MySQL connection info from environment variables

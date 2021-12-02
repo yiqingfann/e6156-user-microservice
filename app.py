@@ -1,17 +1,19 @@
 from flask import Flask, Response, request, redirect, url_for, g
-from flask_cors import CORS
-from flask_dance.contrib.google import google, make_google_blueprint
 import json
-import os
 import uuid
 
 from RDBResource import UserResource, AddressResource
-from context import get_google_blueprint_info
 from notification import SNSNotificationHandler
 
 app = Flask(__name__)
 
 # -------------------- authentication --------------------
+import os
+import re
+import requests
+from flask_cors import CORS
+from flask_dance.contrib.google import google, make_google_blueprint
+from context import get_google_blueprint_info, API_GATEWAY_URL
 
 CORS(app)
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
@@ -26,7 +28,6 @@ google_blueprint = make_google_blueprint(
 app.register_blueprint(google_blueprint, url_prefix="/login")
 google_blueprint = app.blueprints.get("google")
 
-import re
 paths_do_not_require_security = [
     '/login/google/?.*'
 ]
