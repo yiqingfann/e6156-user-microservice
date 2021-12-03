@@ -90,6 +90,7 @@ def get_addresses():
 @app.route('/api/addresses', methods = ['POST'])
 def create_address():
     row_data = request.get_json()
+    row_data['addr_id'] = str(uuid.uuid4())
     AddressResource.create(row_data)
     response = Response("Successfully created address!", status=200)
     return response
@@ -222,6 +223,7 @@ def get_address_of_user(user_id):
 @app.route('/api/users/<user_id>/address', methods = ['POST'])
 def create_address_for_user(user_id):
     row_data = request.get_json()
+    row_data['addr_id'] = str(uuid.uuid4())
     addr_id = AddressResource.create(row_data)
 
     template = {"user_id": user_id}
