@@ -230,6 +230,14 @@ def create_address_for_user(user_id):
     response = Response("Successfully created address for user!", status=200)
     return response
 
+# -------------------- GET, POST /api/users/whoami --------------------
+@app.route('/api/users/whoami', methods = ['GET'])
+def get_whoami():
+    template = {"user_id": g.user_id}
+    result = UserResource.find_by_template(template)
+    response = Response(json.dumps(result), status=200, content_type="application/json")
+    return response
+
 # ------------------- main function -------------------
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=5000)
