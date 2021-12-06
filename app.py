@@ -8,62 +8,46 @@ from notification import SNSNotificationHandler
 app = Flask(__name__)
 
 # -------------------- authentication --------------------
-import os
-import re
 import requests
 from flask_cors import CORS
-from flask_dance.contrib.google import google, make_google_blueprint
-from context import get_google_blueprint_info, API_GATEWAY_URL
-
+from context import API_GATEWAY_URL
 CORS(app)
-os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
-os.environ['OAUTHLIB_RELAX_TOKEN_SCOPE'] = '1'
-app.secret_key = "e6156"
-google_blueprint_info = get_google_blueprint_info()
-google_blueprint = make_google_blueprint(
-    client_id = google_blueprint_info["client_id"],
-    client_secret = google_blueprint_info["client_secret"],
-    scope = ["profile", "email"]
-)
-app.register_blueprint(google_blueprint, url_prefix="/login")
-google_blueprint = app.blueprints.get("google")
-
-paths_do_not_require_security = [
-    '/login/google/?.*'
-]
 
 @app.before_request
 def before_request():
-    for regex in paths_do_not_require_security:
-        if re.match(regex, request.path):
-            return
 
-    if not google.authorized:
-        return redirect(url_for('google.login'))
-    
-    try:
-        # print(json.dumps(google_blueprint.session.token, indent=2))
-        user_data = google.get('/oauth2/v2/userinfo').json()
-        email = user_data['email']
-        template = {'email': email}
-        result = UserResource.find_by_template(template)
-        if not result:
-            user_id = str(uuid.uuid4())
-            template = {
-                'user_id': user_id,
-                'first_name': user_data['given_name'],
-                'last_name': user_data['family_name'],
-                'nickname': user_data['email'],
-                'email': user_data['email'],
-            }
-            UserResource.create(template)
-        else:
-            user_id = result[0]['user_id']
-        g.user_id = user_id
-        g.email = email
-    except:
-        # for oauthlib.oauth2.rfc6749.errors.TokenExpiredError
-        return redirect(url_for('google.login'))
+    # verify id_token
+    id_token = request.headers.get('id_token')
+    url = f"https://oauth2.googleapis.com/tokeninfo?id_token={id_token}"
+    response = requests.get(url)
+    user_data = response.json()
+    email = user_data.get('email')
+
+    # if not verified, return message
+    if not email:
+        response = Response("Please provide a valid google id_token!", status=200)
+        return response
+
+    # if verified
+    template = {'email': email}
+    result = UserResource.find_by_template(template)
+
+    # check if user exist
+    if len(result) == 0:
+        user_id = str(uuid.uuid4())
+        template = {
+            'user_id': user_id,
+            'first_name': user_data['given_name'],
+            'last_name': user_data['family_name'],
+            'nickname': user_data['email'],
+            'email': user_data['email'],
+        }
+        UserResource.create(template)
+    else:
+        user_id = result[0]['user_id']
+
+    g.user_id = user_id
+    g.email = email
 
 # -------------------- notification --------------------
 
