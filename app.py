@@ -173,6 +173,8 @@ def retrieve_user(user_id):
     fields_str = request.args.get('fields')
     field_list = fields_str.split(",") if fields_str else None
     result = UserResource.find_by_template(template, field_list)
+    links = UserResource.get_links(result[0])
+    result[0]['links'] = links
     response = Response(json.dumps(result), status=200, content_type="application/json")
     return response
 
@@ -208,7 +210,8 @@ def get_address_of_user(user_id):
 def create_address_for_user(user_id):
     row_data = request.get_json()
     row_data['addr_id'] = str(uuid.uuid4())
-    addr_id = AddressResource.create(row_data)
+    AddressResource.create(row_data)
+    addr_id = row_data['addr_id']
 
     template = {"user_id": user_id}
     new_data = {"addr_id": addr_id}

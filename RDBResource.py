@@ -47,6 +47,14 @@ class UserResource(BaseRDBResource):
     def get_db_and_table_name(cls):
         return "e6156", "user"
 
+    @classmethod
+    def get_links(cls, data):
+        links = []
+        if data.get('user_id'):
+            links.append({'rel': 'self', 'href': f"/api/users/{data['user_id']}"})
+        if data.get('addr_id'):
+            links.append({'rel': 'address', 'href': f"/api/addresses/{data['addr_id']}"})
+        return links
 
 class AddressResource(BaseRDBResource):
     '''
@@ -57,12 +65,3 @@ class AddressResource(BaseRDBResource):
     def get_db_and_table_name(cls):
         return "e6156", "address"
 
-
-# template = {
-#     "first_name": "zi",
-# }
-# result = UserResource.find_by_template(template)
-# print(result)
-
-# result = UserResource.find_all()
-# print(result)
