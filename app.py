@@ -201,8 +201,10 @@ def get_address_of_user(user_id):
     result = UserResource.find_by_template(template)
 
     addr_id = result[0]["addr_id"]
-    template = {"addr_id": addr_id}
-    result = AddressResource.find_by_template(template)
+    result = []
+    if addr_id is not None:
+        template = {"addr_id": addr_id}
+        result = AddressResource.find_by_template(template)
     response = Response(json.dumps(result), status=200, content_type="application/json")
     return response
 
