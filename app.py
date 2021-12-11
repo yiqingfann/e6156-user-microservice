@@ -193,7 +193,7 @@ def update_user(user_id):
 def delete_user(user_id):
     template = {"user_id": user_id}
     UserResource.delete(template)
-    response = Response("Successfully deleted user!", status=200)
+    response = Response("Successfully deleted user!", status=204)
     return response
 
 # -------------------- GET, POST /api/users/<user_id>/address --------------------
