@@ -43,6 +43,9 @@ def before_request():
             'email': user_data['email'],
         }
         UserResource.create(template)
+        sns_topic_arn = "arn:aws:sns:us-east-2:080252012198:sns_user_created"
+        message = f"---User created: {template}"
+        SNSNotificationHandler.publish_sns_message(sns_topic_arn, message)
     else:
         user_id = result[0]['user_id']
 
