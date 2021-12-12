@@ -214,6 +214,10 @@ def get_address_of_user(user_id):
 @app.route('/api/users/<user_id>/address', methods = ['POST'])
 def create_address_for_user(user_id):
     row_data = request.get_json()
+    for key in row_data.keys():
+        if key in ['street_line_1', 'street_line_2', 'city', 'state', 'zip_code']: continue
+        response = Response(f"Bad data: provided body has invalid key '{key}'", status=400)
+        return response
     row_data['addr_id'] = str(uuid.uuid4())
     AddressResource.create(row_data)
     addr_id = row_data['addr_id']
