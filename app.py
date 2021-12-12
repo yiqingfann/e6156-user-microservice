@@ -102,8 +102,11 @@ def update_address(addr_id):
 @app.route('/api/addresses/<addr_id>', methods = ['DELETE'])
 def delete_address(addr_id):
     template = {"addr_id": addr_id}
-    AddressResource.delete(template)
-    response = Response("Successfully deleted address!", status=200)
+    try:
+        AddressResource.delete(template)
+        response = Response("Successfully deleted address!", status=200)
+    except:
+        response = Response("Integrity error when deleting address!", status=422)
     return response
 
 # -------------------- GET, POST /api/addresses/<addr_id>/users --------------------
